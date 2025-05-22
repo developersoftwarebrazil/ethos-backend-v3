@@ -1,4 +1,6 @@
-import { UserService } from './../../services/user/user.service';
+import { CreateUserDTO } from 'src/users/application/dtos/create-user-dto';
+import { UpdateUserDTO } from 'src/users/application/dtos/update-user-dto';
+import { UserService } from '../../../application/services/user.service';
 import {
   Body,
   Controller,
@@ -9,6 +11,7 @@ import {
   Post,
   Query,
   ParseIntPipe,
+  ValidationPipe,
 } from '@nestjs/common';
 
 @Controller('user')
@@ -32,32 +35,18 @@ export class UserController {
   }
   @Post()
   create(
-    @Body()
-    user: {
-      name: string;
-      email: string;
-      phone: string;
-      imageUrl: string;
-      createdAt: string;
-      role: 'ADMIN' | 'STUDENT' | 'TEACHER';
-    },
+    @Body(ValidationPipe)
+    createUserDTO: CreateUserDTO,
   ) {
-    return this.usaerService.createUser(user);
+    return this.usaerService.createUser(createUserDTO);
   }
   @Patch(':id')
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body()
-    userUpdate: {
-      name: string;
-      email?: string;
-      phone?: string;
-      imageUrl?: string;
-      createdAt?: string;
-      role?: 'ADMIN' | 'STUDENT' | 'TEACHER';
-    },
+    @Body(ValidationPipe)
+    updateUserDTO: UpdateUserDTO,
   ) {
-    return this.usaerService.update(id, userUpdate);
+    return this.usaerService.update(id, updateUserDTO);
   }
 
   @Delete(':id')
