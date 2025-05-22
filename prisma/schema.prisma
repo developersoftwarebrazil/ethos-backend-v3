@@ -9,13 +9,61 @@ generator client {
   output   = "../generated/prisma"
 }
 
+// prisma/schema.prisma
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  directUrl = env("DATABASE_URL_UNPOOLED")
 }
 model User {
-  id        String   @id @default(uuid())
+  id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
+  name      String?
+  password  String
+  role      Role     @default(STUDENT)  // role: STUDENT, TEACHER, ADMIN
+  enrollments Enrollment[]
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id        Int       @id @default(autoincrement())
+  name      String
+  description String?
+  classes   Class[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Class {
+  id        Int       @id @default(autoincrement())
+  name      String
+  course    Course    @relation(fields: [courseId], references: [id])
+  courseId  Int
+  enrollments Enrollment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Enrollment {
+  id       Int      @id @default(autoincrement())
+  user     User     @relation(fields: [userId], references: [id])
+  userId   Int
+  class    Class    @relation(fields: [classId], references: [id])
+  classId  Int
+  enrolledAt DateTime @default(now())
+  status   EnrollmentStatus @default(ACTIVE)
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  INACTIVE
+  COMPLETED
 }

@@ -6,7 +6,7 @@ const bootstrap = createNestHandler();
 export default async function handler(
   req: IncomingMessage,
   res: ServerResponse,
-) {
+): Promise<void> {
   const appHandler = await bootstrap;
-  return appHandler(req, res);
+  await appHandler(req, res);
 }
